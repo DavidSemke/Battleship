@@ -1,0 +1,138 @@
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: auto;
+  background-color: rgb(231, 250, 255);
+  min-height: 100vh;
+  margin: 0;
+}
+
+button {
+  cursor: pointer;
+  background-color: rgb(255, 136, 0);
+  border: 2px solid rgb(212, 113, 0);
+  border-radius: 12px;
+  height: 3em;
+  width: 6em;
+}
+
+button:hover {
+  background-color: rgb(255, 180, 94);
+}
+
+h1 {
+  font-size: 40px;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+td,
+th {
+  text-align: center;
+  width: 40px;
+  height: 40px;
+}
+
+td {
+  border: 1px solid black;
+}
+
+tr {
+  height: 40px;
+}
+
+.alignVertical {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.alignHorizontal {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.gameboard td {
+  background-color: blue;
+}
+
+.gameboard td:hover, .gameboardCellHover {
+  background-color: rgb(0, 162, 255);
+}
+
+.playerData {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.ship {
+  cursor: grab;
+}
+
+.shipCell, .shipCellContainer {
+  background-color: black;
+}
+
+.shipCell {
+  height: 100%;
+}
+
+.textLarge {
+  font-size: 28px;
+}
+
+.textMedium {
+  font-size: 22px;
+}
+
+#gameView {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+}
+
+#playerView {
+  display: flex;
+  justify-content: space-around;
+  background-color: rgb(142, 213, 255);
+  width: 95%;
+  margin-bottom: 30px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border: 2px solid blue;
+}
+
+#shipButtonView {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+#shipView {
+  display: flex;
+  flex-direction: column;
+}
+
+#shipyard {
+  flex: auto;
+  padding: 20px;
+  border: 2px solid blue;
+  background-color: rgb(142, 213, 255);
+}
+
+#statusView {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 30px;
+}
