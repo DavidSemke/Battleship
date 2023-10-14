@@ -38,10 +38,7 @@ th {
 
 td {
   border: 1px solid black;
-}
-
-tr {
-  height: 40px;
+  background-color: blue;
 }
 
 .alignVertical {
@@ -57,12 +54,16 @@ tr {
   gap: 10px;
 }
 
-.gameboard td {
-  background-color: blue;
+.activated td:not(.hit, .sunk):hover, .mishit {
+  background-color: rgb(0, 162, 255);
 }
 
-.gameboard td:hover, .gameboardCellHover {
-  background-color: rgb(0, 162, 255);
+.deactivated {
+  pointer-events: none;
+}
+
+.hit {
+  background-color: red;
 }
 
 .playerData {
@@ -76,12 +77,12 @@ tr {
   cursor: grab;
 }
 
-.shipCell, .shipCellContainer {
+.ship td {
   background-color: black;
 }
 
-.shipCell {
-  height: 100%;
+.sunk {
+  background-color: rgb(0, 0, 107);
 }
 
 .textLarge {
@@ -93,10 +94,13 @@ tr {
 }
 
 #gameView {
+  position: relative;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
+  gap: 40px;
   width: 100%;
+  margin-bottom: 30px;
 }
 
 #playerView {
@@ -119,6 +123,7 @@ tr {
 #shipView {
   display: flex;
   flex-direction: column;
+  width: 300px;
 }
 
 #shipyard {

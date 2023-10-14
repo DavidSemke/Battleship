@@ -1,3 +1,12 @@
+import { 
+    addShipDrag, 
+    addGameboardCellDrop, 
+    addShipyardDrop,
+    addDynamicShipPositioning,
+    addGameboardCellHit
+} from './event'
+
+
 const view = (() => {
     const playerView = document.getElementById('playerView')
     const statusView = document.getElementById('statusView')
@@ -57,10 +66,15 @@ const view = (() => {
         statusView.append(p)
     }
 
-    function displayDeployView(gameboardSize, ships, player, onDoneFunc) {
+    function displayDeployView(ships, player, onDoneFunc) {
         gameView.innerHTML = ''
 
-        const gameBoard = createGameboard(gameboardSize, player)
+        const gameboard = createGameboard(player)
+        const cells = gameboard.querySelectorAll('td')
+
+        for (const cell of cells) {
+            addGameboardCellDrop(cell, ships, player)
+        }
 
         const shipView = document.createElement('div')
         shipView.id = 'shipView'
@@ -90,25 +104,36 @@ const view = (() => {
 
         buttonView.append(flipButton, doneButton)
         shipView.append(buttonView, shipyard)
-        gameView.append(gameBoard, shipView)
+        gameView.append(gameboard, shipView)
+
+        addShipDrag() 
+        addDynamicShipPositioning(ships, player)
     }
 
-    function displayBattleView(gameBoardSize, players) {
+    function displayBattleView(players, onTurnEnd) {
         gameView.innerHTML = ''
 
         for (const player of players) {
-            const gameboard = createGameboard(gameBoardSize, player)
+            const gameboard = createGameboard(player)
+            const cells = gameboard.querySelectorAll('td')
+
+            for (const cell of cells) {
+                addGameboardCellHit(cell, player, onTurnEnd)
+            }
+
+            deactivateGameboard(gameboard)
             gameView.append(gameboard)
-        }  
+        }
     }
 
     // Cells ID format is playerID:row-col
     // Gameboard ID format is playerID:gameboard
-    function createGameboard(size, player) {
+    function createGameboard(player) {
         const gameboard = document.createElement('table')
         gameboard.id = `${player.getId()}:gameboard`
         gameboard.classList.add('gameboard')
 
+        const size = player.getGameboard().getSize()
         const rows = size
         const cols = size
         
@@ -146,7 +171,6 @@ const view = (() => {
                 } else {
                     cell = document.createElement("td");
                     cell.id = `${player.getId()}:${i}-${j - 1}`;
-                    cell.classList.add("dropTarget");
                 }
 
                 row.append(cell);
@@ -158,12 +182,24 @@ const view = (() => {
         return gameboard 
     }
 
+    function activateGameboard(gameboard) {
+        gameboard.classList.remove('deactivated')
+        gameboard.classList.add('activated')
+    }
+
+    function deactivateGameboard(gameboard) {
+        gameboard.classList.remove('activated')
+        gameboard.classList.add('deactivated')
+    }
+
     // Ship table ID format is playerID:shipName-shipID
-    // Ship cell ID format is shipID:i for i in the count of cells ????????? make it playerID:shipName-shipID-i ???????????
+    // Ship cell ID format is shipTableID-i for i in the count of cells
     // Ship cell ID is applied to a div within a td element.
-    function createShipyard(ships, player, horizontal=true) {
+    function createShipyard(ships, player, horizontal=false) {
         // want to view ships in ascending length
         ships.sort((s1, s2) => s1.getLength() - s2.getLength())
+
+        const gameboard = player.getGameboard()
 
         const shipyard = document.createElement('div')
         shipyard.id = 'shipyard'
@@ -173,26 +209,25 @@ const view = (() => {
             shipyard.classList.add('alignHorizontal')
 
             for (const ship of ships) {
-                const shipId = ship.getId()
-
                 const table = document.createElement('table')
                 table.id = `${player.getId()}`
                     + `:${ship.getName()}`
                     + `-${ship.getId()}`
                 table.classList.add('ship')
-                table.draggable = true
-                
+
+                if (gameboard.containsShip(ship)) {
+                    table.id = `${table.id}:clone`
+                    table.style.visibility = 'hidden'
+                }
+                else {
+                    table.draggable = true
+                }
+
                 const row = document.createElement('tr')
         
                 for (let i=0; i<ship.getLength(); i++) {
                     const cell = document.createElement('td')
-                    cell.classList.add('shipCellContainer')
-
-                    const shipCell = document.createElement('div')
-                    shipCell.id = `${shipId}:${i}`
-                    shipCell.classList.add('shipCell')
-                    
-                    cell.append(shipCell)
+                    cell.id = `${table.id}-${i}`
                     row.append(cell)
                 }
         
@@ -204,25 +239,24 @@ const view = (() => {
             shipyard.classList.add('alignVertical')
 
             for (const ship of ships) {
-                const shipId = ship.getId()
-
                 const table = document.createElement('table')
                 table.id = `${player.getId()}`
                     + `:${ship.getName()}`
                     + `-${ship.getId()}`
                 table.classList.add('ship')
-                table.draggable = true
+                
+                if (gameboard.containsShip(ship)) {
+                    table.id = `${table.id}:clone`
+                    table.style.visibility = 'hidden'
+                }
+                else {
+                    table.draggable = true
+                }
 
                 for (let i=0; i<ship.getLength(); i++) {
                     const row = document.createElement('tr')
                     const cell = document.createElement('td')
-                    cell.classList.add('shipCellContainer')
-
-                    const shipCell = document.createElement('div')
-                    shipCell.id = `${shipId}:${i}`
-                    shipCell.classList.add('shipCell')
-
-                    cell.append(shipCell)
+                    cell.id = `${table.id}-${i}`
                     row.append(cell)
                     table.append(row)
                 }
@@ -230,6 +264,8 @@ const view = (() => {
                 shipyard.append(table)
             }
         }
+
+        addShipyardDrop(shipyard, ships, player)
 
         return shipyard
     }
@@ -240,7 +276,9 @@ const view = (() => {
         displayStatusEnd,
         displayStatusMsg,
         displayBattleView,
-        displayDeployView
+        displayDeployView,
+        activateGameboard,
+        deactivateGameboard
     }
 
 })()
